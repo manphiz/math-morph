@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { ZoomIn } from 'lucide-react';
+import { ZoomIn, Plus, Minus, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ExportConfig, Mode } from '../../types';
 
@@ -39,6 +39,21 @@ export function CanvasOverlays({
   mode,
   showDerivative
 }: CanvasOverlaysProps) {
+  const handleZoomIn = (e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    setScaleVal(prev => Math.min(1000, prev * 1.25));
+  };
+
+  const handleZoomOut = (e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    setScaleVal(prev => Math.max(5, prev * 0.8));
+  };
+
+  const handleResetZoom = (e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation();
+    setScaleVal(50);
+  };
+
   return (
     <>
       {/* Zoom Hint Overlay */}
@@ -48,9 +63,9 @@ export function CanvasOverlays({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] text-white/50 bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 uppercase tracking-widest font-bold pointer-events-none z-10"
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 text-[10px] text-white/60 bg-black/70 backdrop-blur-md px-4 py-2 rounded-full border border-white/10 uppercase tracking-widest font-bold pointer-events-none z-10 select-none shadow-lg"
           >
-            <ZoomIn className="w-3 h-3" /> Scroll to Zoom
+            <ZoomIn className="w-3.5 h-3.5 text-[#00d1ff]" /> Pinch or Scroll to Zoom
           </motion.div>
         )}
       </AnimatePresence>
@@ -98,51 +113,83 @@ export function CanvasOverlays({
         )}
       </AnimatePresence>
 
-      {/* Overlay UI for the canvas */}
-      <div className="absolute top-4 right-4 flex flex-col items-end gap-2">
-        {isEditingScale ? (
-          <div className="flex items-center gap-2 bg-black/80 backdrop-blur-md border border-[#00d1ff]/50 rounded-full px-3 py-1 shadow-[0_0_15px_rgba(0,209,255,0.2)]">
-            <span className="text-[10px] font-mono text-white/40 uppercase tracking-tighter">Scale:</span>
-            <input
-              autoFocus
-              type="text"
-              value={tempScale}
-              onChange={(e) => setTempScale(e.target.value)}
-              onBlur={() => {
-                const val = parseFloat(tempScale);
-                if (!isNaN(val) && val > 0) {
-                  setScaleVal(Math.max(5, Math.min(1000, val)));
-                }
-                setIsEditingScale(false);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
+      {/* Overlay UI for the canvas (Scale Pill & Quick Zoom Buttons) */}
+      <div className="absolute top-4 right-4 flex flex-col items-end gap-2 z-20 select-none">
+        <div className="flex items-center gap-1.5 bg-black/70 backdrop-blur-md border border-white/10 rounded-full p-1 shadow-lg">
+          {isEditingScale ? (
+            <div className="flex items-center gap-1 px-2 py-0.5">
+              <span className="text-[10px] font-mono text-white/40 uppercase tracking-tighter">Scale:</span>
+              <input
+                autoFocus
+                type="text"
+                value={tempScale}
+                onChange={(e) => setTempScale(e.target.value)}
+                onBlur={() => {
                   const val = parseFloat(tempScale);
                   if (!isNaN(val) && val > 0) {
                     setScaleVal(Math.max(5, Math.min(1000, val)));
                   }
                   setIsEditingScale(false);
-                } else if (e.key === 'Escape') {
-                  setIsEditingScale(false);
-                }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const val = parseFloat(tempScale);
+                    if (!isNaN(val) && val > 0) {
+                      setScaleVal(Math.max(5, Math.min(1000, val)));
+                    }
+                    setIsEditingScale(false);
+                  } else if (e.key === 'Escape') {
+                    setIsEditingScale(false);
+                  }
+                }}
+                className="w-10 bg-transparent border-none outline-none text-[10px] font-mono text-[#00d1ff] font-bold text-center"
+              />
+              <span className="text-[10px] font-mono text-white/40">%</span>
+            </div>
+          ) : (
+            <button 
+              onClick={() => {
+                setTempScale(scaleVal.toFixed(0));
+                setIsEditingScale(true);
               }}
-              className="w-12 bg-transparent border-none outline-none text-[10px] font-mono text-[#00d1ff] font-bold text-center"
-            />
-            <span className="text-[10px] font-mono text-white/40">%</span>
+              aria-label="Edit Scale Value"
+              className="px-2.5 py-1 text-[10px] font-mono text-white/70 hover:text-[#00d1ff] transition-colors cursor-pointer"
+            >
+              Scale: <span className="text-white font-bold">{scaleVal.toFixed(0)}%</span>
+            </button>
+          )}
+
+          {/* Quick Zoom In/Out Buttons for Touch / iOS */}
+          <div className="flex items-center gap-0.5 border-l border-white/10 pl-1">
+            <button
+              onClick={handleZoomIn}
+              aria-label="Zoom in"
+              className="w-6 h-6 flex items-center justify-center rounded-full text-white/70 hover:text-[#00d1ff] hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
+              title="Zoom in"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleZoomOut}
+              aria-label="Zoom out"
+              className="w-6 h-6 flex items-center justify-center rounded-full text-white/70 hover:text-[#00d1ff] hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
+              title="Zoom out"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleResetZoom}
+              aria-label="Reset zoom to 50%"
+              className="w-6 h-6 flex items-center justify-center rounded-full text-white/40 hover:text-white hover:bg-white/10 active:scale-95 transition-all cursor-pointer"
+              title="Reset Zoom (50%)"
+            >
+              <RotateCcw className="w-3 h-3" />
+            </button>
           </div>
-        ) : (
-          <button 
-            onClick={() => {
-              setTempScale(scaleVal.toFixed(0));
-              setIsEditingScale(true);
-            }}
-            className="px-3 py-1 bg-black/60 backdrop-blur-md border border-white/10 rounded-full text-[10px] font-mono text-white/60 hover:text-[#00d1ff] hover:border-[#00d1ff]/30 transition-all cursor-pointer group"
-          >
-            Scale: <span className="text-white group-hover:text-[#00d1ff] transition-colors">{scaleVal.toFixed(0)}%</span>
-          </button>
-        )}
+        </div>
+
         {mode === 'pro' && (
-          <div className="flex flex-col gap-1 items-end">
+          <div className="flex flex-col gap-1 items-end bg-black/50 backdrop-blur-sm p-2 rounded-lg border border-white/5">
             <div className="flex items-center gap-2">
               <div className="w-3 h-0.5 bg-[#00d1ff]"></div>
               <span className="text-[9px] uppercase text-white/40 font-bold">Function</span>

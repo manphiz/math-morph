@@ -944,6 +944,10 @@ export function MathCanvas({
         const { isExporting: exporting, visualSettings: currentVisuals, mode: currentMode } = stateRef.current;
         if (exporting) return;
 
+        // Skip single-finger mouseDragged pan if currently doing a two-finger pinch gesture on touch devices
+        // @ts-ignore
+        if (p.touches && p.touches.length > 1) return;
+
         const is3D = currentVisuals.show3DComplex && currentMode === 'pro';
 
         if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
@@ -961,11 +965,100 @@ export function MathCanvas({
         }
       };
 
+      // Native multi-touch pinch-to-zoom & pan handling for iOS & mobile devices
+      let initialPinchDistance: number | null = null;
+      let initialScaleOnPinch = 50;
+      let initialMidpoint: { x: number; y: number } | null = null;
+      let initialOffsetOnPinch = { x: 0, y: 0 };
+
+      const getTouchDistance = (t1: Touch, t2: Touch) => {
+        const dx = t1.clientX - t2.clientX;
+        const dy = t1.clientY - t2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+      };
+
+      const getTouchMidpoint = (t1: Touch, t2: Touch) => ({
+        x: (t1.clientX + t2.clientX) / 2,
+        y: (t1.clientY + t2.clientY) / 2,
+      });
+
+      const handleCanvasTouchStart = (e: TouchEvent) => {
+        const { isExporting: exporting } = stateRef.current;
+        if (exporting) return;
+
+        if (e.touches.length === 2) {
+          e.preventDefault();
+          setShowZoomHint(false);
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          initialPinchDistance = getTouchDistance(t1, t2);
+          initialScaleOnPinch = scaleValRef.current;
+          initialMidpoint = getTouchMidpoint(t1, t2);
+          initialOffsetOnPinch = { ...offsetRef.current };
+        } else if (e.touches.length === 1) {
+          initialPinchDistance = null;
+          initialMidpoint = null;
+        }
+      };
+
+      const handleCanvasTouchMove = (e: TouchEvent) => {
+        const { isExporting: exporting } = stateRef.current;
+        if (exporting) return;
+
+        if (e.touches.length === 2 && initialPinchDistance !== null && initialMidpoint !== null) {
+          e.preventDefault();
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          const currentDistance = getTouchDistance(t1, t2);
+          
+          if (initialPinchDistance > 0) {
+            const pinchRatio = currentDistance / initialPinchDistance;
+            const nextScale = Math.max(5, Math.min(1000, initialScaleOnPinch * pinchRatio));
+            setScaleVal(nextScale);
+          }
+
+          // Two-finger smooth pan translation
+          const currentMidpoint = getTouchMidpoint(t1, t2);
+          const dx = currentMidpoint.x - initialMidpoint.x;
+          const dy = currentMidpoint.y - initialMidpoint.y;
+          setOffset({
+            x: initialOffsetOnPinch.x + dx,
+            y: initialOffsetOnPinch.y + dy,
+          });
+        }
+      };
+
+      const handleCanvasTouchEnd = (e: TouchEvent) => {
+        if (e.touches.length < 2) {
+          initialPinchDistance = null;
+          initialMidpoint = null;
+        }
+      };
+
+      const canvasHolder = canvasRef.current;
+      let cleanupTouchListeners: (() => void) | null = null;
+      if (canvasHolder) {
+        canvasHolder.addEventListener('touchstart', handleCanvasTouchStart, { passive: false });
+        canvasHolder.addEventListener('touchmove', handleCanvasTouchMove, { passive: false });
+        canvasHolder.addEventListener('touchend', handleCanvasTouchEnd, { passive: false });
+        canvasHolder.addEventListener('touchcancel', handleCanvasTouchEnd, { passive: false });
+
+        cleanupTouchListeners = () => {
+          canvasHolder.removeEventListener('touchstart', handleCanvasTouchStart);
+          canvasHolder.removeEventListener('touchmove', handleCanvasTouchMove);
+          canvasHolder.removeEventListener('touchend', handleCanvasTouchEnd);
+          canvasHolder.removeEventListener('touchcancel', handleCanvasTouchEnd);
+        };
+      }
+
       p.windowResized = () => {
         if (canvasRef.current) {
           p.resizeCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
         }
       };
+
+      // Expose cleanup
+      (sketch as any).cleanupTouch = cleanupTouchListeners;
     };
 
     let ro: ResizeObserver | null = null;
@@ -1001,6 +1094,9 @@ export function MathCanvas({
         cancelAnimationFrame(rafId);
       }
       ro?.disconnect();
+      if ((sketch as any).cleanupTouch) {
+        (sketch as any).cleanupTouch();
+      }
       p5Instance.current?.remove();
     };
   }, []);
