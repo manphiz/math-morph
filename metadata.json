@@ -1,0 +1,8 @@
+{
+  "name": "Math Morph Pro",
+  "description": "Interactive mathematical equation visualization tool with real-time parameter morphing.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
