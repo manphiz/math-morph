@@ -44,6 +44,12 @@ async function generateIcons() {
       desc: '180x180 Apple Touch Icon',
       options: { quality: 100 },
     },
+    {
+      outputPath: path.join(rootDir, 'ios', 'App', 'App', 'Assets.xcassets', 'AppIcon.appiconset', 'AppIcon-512@2x.png'),
+      size: 1024,
+      desc: '1024x1024 Universal iOS App Icon',
+      options: { quality: 100, compressionLevel: 9 },
+    },
   ];
 
   // Ensure directories exist
