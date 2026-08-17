@@ -8,7 +8,8 @@ const config: CapacitorConfig = {
     androidScheme: 'https',
   },
   ios: {
-    contentInset: 'always',
+    contentInset: 'never',
+    scrollEnabled: false,
     preferredContentMode: 'mobile',
     scheme: 'Math Morph Pro',
     backgroundColor: '#0a0a0a',
