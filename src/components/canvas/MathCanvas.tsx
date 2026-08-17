@@ -1102,7 +1102,7 @@ export function MathCanvas({
   }, []);
 
   return (
-    <main className="w-full h-full bg-[#050505] relative flex items-center justify-center p-2 sm:p-4 landscape:p-6 lg:p-10">
+    <main className="w-full h-full bg-[#050505] relative flex items-center justify-center p-2 sm:p-4 landscape:p-6 lg:landscape:p-8">
       <div 
         className="absolute inset-0 opacity-20 pointer-events-none" 
         style={{ backgroundImage: 'radial-gradient(#333 1px, transparent 1px)', backgroundSize: '40px 40px' }}
