@@ -11,7 +11,7 @@ const config: CapacitorConfig = {
     contentInset: 'never',
     scrollEnabled: false,
     preferredContentMode: 'mobile',
-    scheme: 'Math Morph',
+    scheme: 'mathmorph',
     backgroundColor: '#0a0a0a',
   },
 };
