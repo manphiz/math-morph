@@ -47,8 +47,30 @@ async function generateIcons() {
     {
       outputPath: path.join(rootDir, 'ios', 'App', 'App', 'Assets.xcassets', 'AppIcon.appiconset', 'AppIcon-512@2x.png'),
       size: 1024,
-      desc: '1024x1024 Universal iOS App Icon',
-      options: { quality: 100, compressionLevel: 9 },
+      desc: '1024x1024 Universal iOS App Icon (Flattened RGB, No Alpha)',
+      flatten: '#0a0a0a',
+      options: { quality: 100, palette: false },
+    },
+    {
+      outputPath: path.join(rootDir, 'ios', 'App', 'App', 'Assets.xcassets', 'Splash.imageset', 'splash-1x.png'),
+      size: 910,
+      desc: '910x910 iOS Universal Splash 1x',
+      flatten: '#0a0a0a',
+      options: { quality: 100, palette: false },
+    },
+    {
+      outputPath: path.join(rootDir, 'ios', 'App', 'App', 'Assets.xcassets', 'Splash.imageset', 'splash-2x.png'),
+      size: 1820,
+      desc: '1820x1820 iOS Universal Splash 2x',
+      flatten: '#0a0a0a',
+      options: { quality: 100, palette: false },
+    },
+    {
+      outputPath: path.join(rootDir, 'ios', 'App', 'App', 'Assets.xcassets', 'Splash.imageset', 'splash-3x.png'),
+      size: 2730,
+      desc: '2730x2730 iOS Universal Splash 3x',
+      flatten: '#0a0a0a',
+      options: { quality: 100, palette: false },
     },
   ];
 
@@ -63,10 +85,11 @@ async function generateIcons() {
   console.log('Generating icon assets via sharp...');
 
   for (const target of targets) {
-    const buffer = await sharp(svgBuffer)
-      .resize(target.size, target.size)
-      .png(target.options)
-      .toBuffer();
+    let pipeline = sharp(svgBuffer).resize(target.size, target.size);
+    if (target.flatten) {
+      pipeline = pipeline.flatten({ background: target.flatten });
+    }
+    const buffer = await pipeline.png(target.options).toBuffer();
 
     fs.writeFileSync(target.outputPath, buffer);
     const relPath = path.relative(rootDir, target.outputPath);
