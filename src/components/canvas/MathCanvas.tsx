@@ -992,9 +992,9 @@ export function MathCanvas({
           const t1 = e.touches[0];
           const t2 = e.touches[1];
           initialPinchDistance = getTouchDistance(t1, t2);
-          initialScaleOnPinch = scaleValRef.current;
+          initialScaleOnPinch = stateRef.current.scaleVal;
           initialMidpoint = getTouchMidpoint(t1, t2);
-          initialOffsetOnPinch = { ...offsetRef.current };
+          initialOffsetOnPinch = { ...stateRef.current.offset };
         } else if (e.touches.length === 1) {
           initialPinchDistance = null;
           initialMidpoint = null;

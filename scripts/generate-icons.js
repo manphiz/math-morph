@@ -44,7 +44,19 @@ async function generateIcons() {
       desc: '180x180 Apple Touch Icon',
       options: { quality: 100 },
     },
-    ];
+    {
+      outputPath: path.join(rootDir, 'assets', 'icon.png'),
+      size: 1024,
+      desc: '1024x1024 Capacitor Source Icon',
+      options: { quality: 100 },
+    },
+    {
+      outputPath: path.join(rootDir, 'assets', 'splash.png'),
+      size: 2732,
+      desc: '2732x2732 Capacitor Source Splash',
+      options: { quality: 100 },
+    },
+  ];
 
   // Ensure directories exist
   for (const target of targets) {

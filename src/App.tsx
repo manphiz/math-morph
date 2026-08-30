@@ -378,15 +378,15 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col landscape:flex-row h-screen w-screen bg-[#111111] text-white font-sans overflow-hidden select-none">
+    <div className="flex flex-col landscape:flex-row lg:flex-row h-screen w-screen bg-[#111111] text-white font-sans overflow-hidden select-none">
       {/* Top Banner rendered above canvas in portrait mode only */}
-      <div className="order-0 block landscape:hidden w-full flex-shrink-0 bg-panel-1 border-b border-white/5 px-4 pt-[max(env(safe-area-inset-top),28px)] pb-3 z-20 shadow-md">
+      <div className="order-0 block landscape:hidden lg:hidden w-full flex-shrink-0 bg-panel-1 border-b border-white/5 px-4 pt-[max(env(safe-area-inset-top),28px)] pb-3 z-20 shadow-md">
         <AppBanner mode={mode} setMode={setMode} />
       </div>
 
       {/* Canvas in portrait mode (order-1), dynamic left or right in landscape mode */}
-      <div className={`order-1 ${sidebarPosition === 'left' ? 'landscape:order-2' : 'landscape:order-1'} w-full landscape:flex-1 h-[40vh] sm:h-[45vh] md:h-[48vh] landscape:h-full flex-shrink-0 landscape:flex-shrink-0 min-w-0 min-h-0 overflow-hidden flex items-center justify-center`}>
-        <div className="w-full h-full landscape:min-w-[100vh] flex-1 relative">
+      <div className={`order-1 ${sidebarPosition === 'left' ? 'landscape:order-2 lg:order-2' : 'landscape:order-1 lg:order-1'} w-full landscape:flex-1 lg:flex-1 h-[40vh] sm:h-[45vh] md:h-[48vh] landscape:h-full lg:h-full flex-shrink-0 landscape:flex-shrink-0 lg:flex-shrink-0 min-w-0 min-h-0 overflow-hidden flex items-center justify-center`}>
+        <div className="w-full h-full landscape:min-w-[100vh] lg:min-w-0 flex-1 relative">
           <MathCanvas 
             scaleVal={scaleVal}
             setScaleVal={setScaleVal}
@@ -425,7 +425,7 @@ export default function App() {
       </div>
 
       {/* Bottom scrollable controls panel in portrait mode, left or right sidebar in landscape mode */}
-      <div className={`order-2 ${sidebarPosition === 'left' ? 'landscape:order-1' : 'landscape:order-2'} flex flex-col flex-1 landscape:flex-none w-full landscape:w-[280px] sm:landscape:w-[320px] md:landscape:w-[360px] lg:landscape:w-[400px] xl:landscape:w-[420px] landscape:flex-shrink-0 landscape:h-full min-h-0 overflow-hidden`}>
+      <div className={`order-2 ${sidebarPosition === 'left' ? 'landscape:order-1 lg:order-1' : 'landscape:order-2 lg:order-2'} flex flex-col flex-1 landscape:flex-none lg:flex-none w-full landscape:w-[280px] sm:landscape:w-[320px] md:landscape:w-[360px] lg:landscape:w-[400px] xl:landscape:w-[420px] landscape:flex-shrink-0 lg:flex-shrink-0 landscape:h-full lg:h-full min-h-0 overflow-hidden`}>
         <Sidebar 
           sidebarPosition={sidebarPosition}
           onToggleSidebarPosition={toggleSidebarPosition}
