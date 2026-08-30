@@ -107,13 +107,13 @@ export function Sidebar({
   onToggleSidebarPosition
 }: SidebarProps) {
   const borderClass = sidebarPosition === 'right' 
-    ? 'landscape:border-l lg:border-l' 
-    : 'landscape:border-r lg:border-r';
+    ? 'landscape:border-l' 
+    : 'landscape:border-r';
 
   return (
-    <aside className={`w-full landscape:w-[260px] sm:landscape:w-[290px] md:landscape:w-[320px] lg:w-[400px] xl:w-[420px] h-full bg-panel-1 border-t landscape:border-t-0 lg:border-t-0 ${borderClass} border-white/5 p-3 sm:p-5 lg:p-6 flex flex-col gap-3 sm:gap-4 lg:gap-6 z-10 shadow-2xl overflow-y-auto`}>
-      {/* App banner header displayed inside sidebar for landscape / desktop mode */}
-      <header className="hidden landscape:flex lg:flex items-center justify-between">
+    <aside className={`w-full landscape:w-[280px] sm:landscape:w-[320px] md:landscape:w-[360px] lg:landscape:w-[400px] xl:landscape:w-[420px] h-full bg-panel-1 border-t landscape:border-t-0 ${borderClass} border-white/5 p-3 sm:p-5 landscape:p-4 lg:landscape:p-6 flex flex-col gap-3 sm:gap-4 landscape:gap-4 lg:landscape:gap-6 z-10 shadow-2xl overflow-y-auto`}>
+      {/* App banner header displayed inside sidebar for landscape mode */}
+      <header className="hidden landscape:flex items-center justify-between">
         <AppBanner 
           mode={mode} 
           setMode={setMode} 
