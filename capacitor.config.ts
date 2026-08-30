@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.mathmorph.pro',
+  appId: 'com.mathmorph.mathmorph',
   appName: 'Math Morph',
   webDir: 'dist',
   server: {
